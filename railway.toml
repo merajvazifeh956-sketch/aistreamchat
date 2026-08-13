@@ -9,8 +9,6 @@
   # web panel -> public HTTPS domain (https://xxx.up.railway.app)
   [deploy.ports.2053]
     protocol = "http"
-  # proxy traffic -> HTTP, so Cloudflare can front it (VLESS + WebSocket).
-  # Reality can't pass through Cloudflare (TLS termination breaks it),
-  # so use VLESS + WebSocket on this port with Cloudflare in front.
+  # proxy traffic -> TCP proxy domain:port (random external port)
   [deploy.ports.443]
-    protocol = "http"
+    protocol = "tcp"

@@ -67,36 +67,6 @@ fi
   echo "=============================================="
 } | tee "${CONFIG_DIR}/panel-info.txt"
 
-# --- optional runtime vars passed straight to x-ui ----------
-# XUI_DB_TYPE / XUI_DB_DSN / XUI_DB_FOLDER      (database backend)
-# XUI_LOG_LEVEL                                 (debug|info|warning|error)
-# XUI_ENABLE_FAIL2BAN                           (true|false)
-# XUI_TUNNEL_HEALTH_URL / _INTERVAL / _TIMEOUT / _FAILURES
-# XUI_TUNNEL_HEALTH_MONITOR / XUI_TUNNEL_HEALTH_PROXY
-# (these are read by x-ui from the environment as-is)
-
-# --- run, with a neutral process name + crash watchdog -------
+# --- run, with a neutral process name ----------------------
 cd /opt/app
-
-_term() {
-  echo "[watchdog] stop signal received" >&2
-  kill -TERM "${XUI_PID:-0}" 2>/dev/null || true
-  exit 0
-}
-trap _term TERM INT
-
-launch() {
-  exec -a "${APP_NAME}" ./x-ui
-}
-
-while :; do
-  ( launch ) &
-  XUI_PID=$!
-  set +e
-  wait "${XUI_PID}"
-  code=$?
-  set -e
-  XUI_PID=
-  echo "[watchdog] x-ui exited (code ${code}), restarting in 3s" | tee -a "${CONFIG_DIR}/panel-info.txt"
-  sleep 3
-done
+exec -a "${APP_NAME}" ./x-ui
