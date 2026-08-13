@@ -6,7 +6,11 @@
   restartPolicyType = "always"
 
 [deploy.ports]
+  # web panel -> public HTTPS domain (https://xxx.up.railway.app)
   [deploy.ports.2053]
-    protocol = "tcp"
+    protocol = "http"
+  # proxy traffic -> HTTP, so Cloudflare can front it (VLESS + WebSocket).
+  # Reality can't pass through Cloudflare (TLS termination breaks it),
+  # so use VLESS + WebSocket on this port with Cloudflare in front.
   [deploy.ports.443]
-    protocol = "tcp"
+    protocol = "http"

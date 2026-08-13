@@ -44,17 +44,25 @@ cat > "${CONFIG_DIR}/config.json" <<EOF
 EOF
 
 # --- print & save panel info -------------------------------
+PANEL_URL=""
+PROXY_ADDR=""
+if [ -n "${RAILWAY_PUBLIC_DOMAIN:-}" ]; then
+  PANEL_URL="https://${RAILWAY_PUBLIC_DOMAIN}${URL_PATH}"
+fi
+if [ -n "${RAILWAY_TCP_PROXY_DOMAIN:-}" ]; then
+  PROXY_ADDR="${RAILWAY_TCP_PROXY_DOMAIN}:${RAILWAY_TCP_PROXY_PORT:-443}"
+fi
+
 {
   echo "=============================================="
   echo "  location : ${LOCATION}"
-  echo "  web port : ${WEB_PORT}"
-  echo "  web path : ${WEB_BASE}"
   echo "  login    : admin / admin"
-  if [ -n "${RAILWAY_PUBLIC_DOMAIN:-}" ]; then
-    echo "  panel    : https://${RAILWAY_PUBLIC_DOMAIN}${URL_PATH}"
+  if [ -n "${PANEL_URL}" ]; then
+    echo "  panel    : ${PANEL_URL}"
   fi
-  if [ -n "${RAILWAY_TCP_PROXY_DOMAIN:-}" ]; then
-    echo "  tcp proxy: ${RAILWAY_TCP_PROXY_DOMAIN}:${RAILWAY_TCP_PROXY_PORT:-443}  (panel at ${WEB_BASE})"
+  if [ -n "${PROXY_ADDR}" ]; then
+    echo "  proxy    : ${PROXY_ADDR}"
+    echo "             (use THIS in your client config, not port 443)"
   fi
   echo "=============================================="
 } | tee "${CONFIG_DIR}/panel-info.txt"
